@@ -32,7 +32,7 @@ class Loader
         }
         else
         {
-            $pathArray[0] = LIBRARY_PATH . '/Aria/' . $pathArray[0];
+            $pathArray[0] = ARIA_PATH . '/' . $pathArray[0];
         }
 
         if (file_exists(implode('/', $pathArray) . '.php'))

@@ -7,6 +7,7 @@ class Request
     protected $__session;
     protected $_server;
     protected $_request;
+    protected $_router;
     protected $_post;
     protected $_get;
     protected $_host;
@@ -26,6 +27,7 @@ class Request
         $this->_session = isset($_SESSION) ? $_SESSION : null;
         $this->_server = $_SERVER;
         $this->_request = $_REQUEST;
+        $this->_router = new Router();
         $this->_post = $_POST;
         $this->_get = $_GET;
         $this->_host = $_SERVER['HTTP_HOST'];
@@ -36,44 +38,56 @@ class Request
         $this->_serverPort = $_SERVER['SERVER_PORT'];
         $this->_remoteAddr = $_SERVER['REMOTE_ADDR'];
         $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
+        $this->_requestParams = array();
         //unset($_SESSION);
         //unset($_SERVER);
         //unset($_REQUEST);
         //unset($_POST);
         //unset($_GET);
 
-        $pieces = explode('?', $this->_uri);
-        $pieces = explode(',', $pieces[0]);
+        $this->_requestParams['_post'] = $this->_post;
+        $this->_requestParams['_get'] = $this->_get;
 
-        if (isset($pieces[0]) && !empty($pieces[0]))
-        {
-            if ($pieces[0] == '/')
+        $result = $this->_router->findRoute(ltrim($this->_uri, '/'));
+        if ($result['success']) {
+            $this->_controllerName = $result['controller'];
+            $this->_actionName = $result['action'];
+            $this->_requestParams['_path'] = $result['params'];
+
+        } else {
+
+            $pieces = explode('?', $this->_uri);
+            $path = isset($pieces[0]) ? $pieces[0] : null;
+            $query = isset($pieces[1]) ? $pieces[1] : null;
+            $pieces = explode(',', $path);
+
+            if (isset($pieces[0]) && !empty($pieces[0]))
             {
-                $this->_controllerName = 'index';
+                if ($pieces[0] == '/')
+                {
+                    $this->_controllerName = 'index';
+                }
+                else
+                {
+                    $this->_controllerName = trim($pieces[0], '/');
+                }
             }
             else
             {
-                $this->_controllerName = trim($pieces[0], '/');
+                $this->_controllerName = 'index';
             }
-        }
-        else
-        {
-            $this->_controllerName = 'index';
-        }
 
-        $this->_actionName = (isset($pieces[1]) && !empty($pieces[1])) ? $pieces[1] : 'index';
-        
-        $paramsPieces = array_splice($pieces, 2);
-        $this->_requestParams = array();
-        for ($x = 0; $x < count($paramsPieces); $x+=2)
-        {
-            if (isset($paramsPieces[$x+1]))
+            $this->_actionName = (isset($pieces[1]) && !empty($pieces[1])) ? $pieces[1] : 'index';
+            
+            $paramsPieces = array_splice($pieces, 2);
+            for ($x = 0; $x < count($paramsPieces); $x+=2)
             {
-                $this->_requestParams[$paramsPieces[$x]] = $paramsPieces[$x+1];
+                if (isset($paramsPieces[$x+1]))
+                {
+                    $this->_requestParams['_path'][$paramsPieces[$x]] = $paramsPieces[$x+1];
+                }
             }
         }
-		$this->_requestParams['_post'] = $this->_post;
-		$this->_requestParams['_get'] = $this->_get;
 
     }
 
@@ -109,15 +123,11 @@ class Request
 
     public function getParams($scope = 'all')
     {
-        switch ($scope) {
-        case 'all':
+        if ($scope == 'all') {
             return $this->_requestParams;
-        case 'get':
-            return $this->_requestParams['_get'];
-        case 'post':
-            return $this->_requestParams['_post'];
+        } else {
+            return isset($this->_requestParams[$scope]) ? $this->_requestParams[$scope] : false;
         }
-
     }
 
     public function getParam($name, $scope = 'all') // Possible scopes: all, get, post
@@ -132,7 +142,7 @@ class Request
         if (isset($this->_requestParams['_get'][$name])) {
             return $this->_requestParams['_get'][$name];
         }
-        
+        return false;
     }
 
     public function isPost()

@@ -23,7 +23,7 @@ class Mvc_Application
 	{
 		$this->_domain = $_SERVER['SERVER_NAME'];
 		$domainsConfig = json_decode(file_get_contents(ROOT_PATH . 'config/domains.json'), true);
-        Registry::getInstance()->set('config', $domainsConfig);
+        Registry::getInstance()->set('config', $domainsConfig[$this->_domain]);
 		$this->_module = $domainsConfig[$this->_domain]['module'];
 		defined('APPLICATION_PATH') || define('APPLICATION_PATH', ROOT_PATH . 'application/' . $this->_module);
 		set_include_path(get_include_path() . PATH_SEPARATOR . APPLICATION_PATH);
