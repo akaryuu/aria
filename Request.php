@@ -31,7 +31,7 @@ class Request
         $this->_post = $_POST;
         $this->_get = $_GET;
         $this->_host = $_SERVER['HTTP_HOST'];
-        $this->_uri = defined('SCRIPT_PATH') ? substr($_SERVER['REQUEST_URI'], strlen(SCRIPT_PATH)) : $_SERVER['REQUEST_URI'];
+        $this->_uri = $this->_parseUri();
         $this->_userAgent = $_SERVER['HTTP_USER_AGENT'];
         $this->_serverName = $_SERVER['SERVER_NAME'];
         $this->_serverAddr = $_SERVER['SERVER_ADDR'];
@@ -124,7 +124,7 @@ class Request
     public function getParams($scope = 'all')
     {
         if ($scope == 'all') {
-            return $this->_requestParams;
+            return array_merge($this->_requestParams['_path'], $this->_requestParams['_post'], $this->_requestParams['_get']);
         } else {
             return isset($this->_requestParams[$scope]) ? $this->_requestParams[$scope] : false;
         }
@@ -135,6 +135,9 @@ class Request
         /* Currently scope is not supported. Todo */
         if (isset($this->_requestParams[$name])) {
             return $this->_requestParams[$name];
+        }
+        if (isset($this->_requestParams['_path'][$name])) {
+            return $this->_requestParams['_path'][$name];
         }
         if (isset($this->_requestParams['_post'][$name])) {
             return $this->_requestParams['_post'][$name];
@@ -148,5 +151,10 @@ class Request
     public function isPost()
     {
         return $this->_requestMethod === 'POST' ? true : false;
+    }
+
+    protected function _parseUri()
+    {
+        return defined('SCRIPT_PATH') ? substr($_SERVER['REQUEST_URI'], strlen(SCRIPT_PATH)) : $_SERVER['REQUEST_URI'];
     }
 }
