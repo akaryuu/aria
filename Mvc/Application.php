@@ -16,13 +16,23 @@ class Mvc_Application
 {
 	protected $_templateEngine;
 	protected $_frontController;
+    protected $_requestUrl;
 	protected $_domain;
 	protected $_module;
 
 	public function __construct()
 	{
-		$this->_domain = $_SERVER['SERVER_NAME'];
+		$this->_domain = null;
+        $this->_requestUrl = preg_match('/[a-z]+/', SCRIPT_PATH) ? $_SERVER['SERVER_NAME'] . SCRIPT_PATH : $_SERVER['SERVER_NAME'];
 		$domainsConfig = json_decode(file_get_contents(ROOT_PATH . 'config/domains.json'), true);
+        foreach ($domainsConfig as $domain => $config) {
+            if (preg_match('/' . preg_replace('/\//', '\/', $domain) . '$/', $this->_requestUrl)) {
+                $this->_domain = $domain;
+            }
+        }
+        if (!$this->_domain) {
+            throw new Exception("This domain does not exist in configuration");
+        }
         Registry::getInstance()->set('config', $domainsConfig[$this->_domain]);
 		$this->_module = $domainsConfig[$this->_domain]['module'];
 		defined('APPLICATION_PATH') || define('APPLICATION_PATH', ROOT_PATH . 'application/' . $this->_module);

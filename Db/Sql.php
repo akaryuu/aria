@@ -2,7 +2,7 @@
 
 namespace Aria;
 
-class Sql
+class Db_Sql
 {
     protected $_query = array(
         'action' => '',
@@ -14,11 +14,13 @@ class Sql
         'offset' => 0
     );
 
+    protected $_db;
+
     protected $_string = '';
 
     function __construct()
     {
-
+        $this->_db = new Db();
     }
 
     public function select()
@@ -95,6 +97,7 @@ class Sql
                 $sql[] = $this->_prepareColumns();
                 $sql[] = 'FROM';
                 $sql[] = $this->_prepareTables();
+                $sql[] = $this->_prepareConditions();
                 $sql[] = $this->_prepareLimit();
                 break;
             }
@@ -175,6 +178,25 @@ class Sql
         }
 
         return implode(',', $sql);
+
+    }
+
+    protected function _prepareConditions()
+    {
+        if (!empty($this->_query['where']))
+        {
+            $sql = array();
+
+            foreach ($this->_query['where'] as $key => $value)
+            {
+                $sql[] = $key . '=' . '\'' . $value . '\''; 
+
+            }
+
+            return ' WHERE ' . implode(' ', $sql);
+        }
+
+        return '';
 
     }
     
