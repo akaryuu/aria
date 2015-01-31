@@ -35,6 +35,18 @@ class Db_Sql
         return $this;       
     }
 
+    public function update()
+    {
+        $this->_query['action'] = 'update';
+        return $this;       
+    }
+
+    public function create()
+    {
+        $this->_query['action'] = 'create';
+        return $this;       
+    }
+
     public function columns(array $columns)
     {
         $this->_query['columns'] = $columns;
@@ -42,6 +54,12 @@ class Db_Sql
     }
 
     public function from(array $tables)
+    {
+        $this->_query['tables'] = $tables;
+        return $this;
+    }
+
+    public function table(array $tables)
     {
         $this->_query['tables'] = $tables;
         return $this;
@@ -111,6 +129,22 @@ class Db_Sql
                 $sql[] = 'VALUES (';
                 $sql[] = $this->_prepareValues();
                 $sql[] = ')';
+                break;
+            }
+            case 'update':
+            {
+                $sql[] = 'UPDATE';
+                $sql[] = $this->_prepareTables();
+                $sql[] = 'SET';
+                //$sql[] = $this->_prepareSetValues();
+                $sql[] = $this->_prepareConditions();
+                break;
+            }
+            case 'delete':
+            {
+                $sql[] = 'DELETE FROM';
+                $sql[] = $this->_prepareTables();
+                $sql[] = $this->_prepareConditions();
                 break;
             }
         }

@@ -10,6 +10,7 @@ class Bootstrap
         error_reporting(E_ALL);
         ini_set('display_errors', 'On');
 
+        define('CONFIG_PATH', $config_folder_path);
 		$config = json_decode(file_get_contents($config_folder_path . 'config.json'), true);
 
         self::_setOptionsFromConfig($config);
