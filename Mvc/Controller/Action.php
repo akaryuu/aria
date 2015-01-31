@@ -20,6 +20,8 @@ abstract class Mvc_Controller_Action
         $controllerFront->addView($this->_view);
         $this->_request = $controllerFront->getRequest();
 
+        $this->_layout->assign('currentPage', isset($this->_breadcrumb) ? $this->_breadcrumb : '');
+
         /* Built-in Ajax support to be reviewed */
         //if (preg_match('/^ajax-/', $this->_request->getControllerName()))
         //{

@@ -42,7 +42,7 @@ class Exception extends \Exception
 
     public static function silentExceptionHandler(Exception $e)
     {
-        echo 'Error occured while loading the page. We\'re sorry.<br />If this error will not dissappear in few minutes please contact administrator: test@test.pl';
+        echo 'Error occured while loading the page. We\'re sorry.<br />If this error will not dissappear in few minutes please contact administrator: admin@mouseinabox.info';
         //TODO: Implement logging
     }
 }

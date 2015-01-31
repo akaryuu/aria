@@ -15,6 +15,7 @@ class Template extends \Smarty
         $this->setCompileDir(ROOT_PATH . 'var/templates_c/');
         $this->setConfigDir(ROOT_PATH . 'var/configs/');
         $this->setCacheDir(ROOT_PATH . 'var/cache/');
+        $this->addPluginsDir(ROOT_PATH . 'SmartyPlugins/');
         //$this->testInstall();
     }
 

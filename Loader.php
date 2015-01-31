@@ -38,9 +38,16 @@ class Loader
         if (file_exists(implode('/', $pathArray) . '.php'))
         {
             require_once(implode('/', $pathArray) . '.php');
-                if (!class_exists($classname))
-                {
-                    throw new Exception('Class ' . $classname . ' not found :/');
+                if (preg_match('/.+Interface/', $classname)) {
+                    if (!interface_exists($classname))
+                    {
+                        throw new Exception('Interface ' . $classname . ' not found :/');
+                    }
+                } else {
+                    if (!class_exists($classname))
+                    {
+                        throw new Exception('Class ' . $classname . ' not found :/');
+                    }
                 }
         }
         else

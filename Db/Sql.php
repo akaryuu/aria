@@ -2,7 +2,7 @@
 
 namespace Aria;
 
-class Sql
+class Db_Sql
 {
     protected $_query = array(
         'action' => '',
@@ -14,11 +14,13 @@ class Sql
         'offset' => 0
     );
 
+    protected $_db;
+
     protected $_string = '';
 
     function __construct()
     {
-
+        $this->_db = new Db();
     }
 
     public function select()
@@ -33,6 +35,18 @@ class Sql
         return $this;       
     }
 
+    public function update()
+    {
+        $this->_query['action'] = 'update';
+        return $this;       
+    }
+
+    public function create()
+    {
+        $this->_query['action'] = 'create';
+        return $this;       
+    }
+
     public function columns(array $columns)
     {
         $this->_query['columns'] = $columns;
@@ -40,6 +54,12 @@ class Sql
     }
 
     public function from(array $tables)
+    {
+        $this->_query['tables'] = $tables;
+        return $this;
+    }
+
+    public function table(array $tables)
     {
         $this->_query['tables'] = $tables;
         return $this;
@@ -95,6 +115,7 @@ class Sql
                 $sql[] = $this->_prepareColumns();
                 $sql[] = 'FROM';
                 $sql[] = $this->_prepareTables();
+                $sql[] = $this->_prepareConditions();
                 $sql[] = $this->_prepareLimit();
                 break;
             }
@@ -108,6 +129,22 @@ class Sql
                 $sql[] = 'VALUES (';
                 $sql[] = $this->_prepareValues();
                 $sql[] = ')';
+                break;
+            }
+            case 'update':
+            {
+                $sql[] = 'UPDATE';
+                $sql[] = $this->_prepareTables();
+                $sql[] = 'SET';
+                //$sql[] = $this->_prepareSetValues();
+                $sql[] = $this->_prepareConditions();
+                break;
+            }
+            case 'delete':
+            {
+                $sql[] = 'DELETE FROM';
+                $sql[] = $this->_prepareTables();
+                $sql[] = $this->_prepareConditions();
                 break;
             }
         }
@@ -175,6 +212,25 @@ class Sql
         }
 
         return implode(',', $sql);
+
+    }
+
+    protected function _prepareConditions()
+    {
+        if (!empty($this->_query['where']))
+        {
+            $sql = array();
+
+            foreach ($this->_query['where'] as $key => $value)
+            {
+                $sql[] = $key . '=' . '\'' . $value . '\''; 
+
+            }
+
+            return ' WHERE ' . implode(' ', $sql);
+        }
+
+        return '';
 
     }
     
