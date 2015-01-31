@@ -50,6 +50,11 @@ class Request
 
         $result = $this->_router->findRoute(ltrim($this->_uri, '/'));
         if ($result['success']) {
+            if (!empty($result['redirect'])) {
+                header('Location: ' . $result['redirect'][key($result['redirect'])], key($result['redirect']));
+                die;
+            }
+
             $this->_controllerName = $result['controller'];
             $this->_actionName = $result['action'];
             $this->_requestParams['_path'] = $result['params'];

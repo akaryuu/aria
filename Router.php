@@ -28,9 +28,10 @@ class Router
 
                 $result = array(
                     'success' => true,
-                    'controller' => $params['controller'],
-                    'action' => $params['action'],
-                    'params' => (isset($params['static_params']) ? $params['static_params'] : array()) 
+                    'controller' => (isset($params['controller']) ? $params['controller'] : null),
+                    'action' => (isset($params['action']) ? $params['action'] : null),
+                    'params' => (isset($params['static_params']) ? $params['static_params'] : array()), 
+                    'redirect' => (isset($params['redirect']) ? $params['redirect'] : null)
                 );
 
                 if (!empty($params['dynamic_params'])) {
