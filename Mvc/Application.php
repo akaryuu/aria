@@ -37,7 +37,7 @@ class Mvc_Application
 		$this->_module = $domainsConfig[$this->_domain]['module'];
 		defined('APPLICATION_PATH') || define('APPLICATION_PATH', ROOT_PATH . 'application/' . $this->_module);
 		set_include_path(get_include_path() . PATH_SEPARATOR . APPLICATION_PATH);
-		$this->_frontController = Mvc_Controller_Front::getInstance();
+		$this->_frontController = Mvc_FrontController::getInstance();
 		$this->_templateEngine = new Template();
 
         // Initializing module default database

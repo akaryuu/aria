@@ -10,7 +10,7 @@ class Template extends \Smarty
     public function __construct()
     {
         parent::__construct();
-        $this->_response = Mvc_Controller_Front::getInstance()->getResponse();
+        $this->_response = Mvc_FrontController::getInstance()->getResponse();
         $this->setTemplateDir(APPLICATION_PATH . '/View/');
         $this->setCompileDir(ROOT_PATH . 'var/templates_c/');
         $this->setConfigDir(ROOT_PATH . 'var/configs/');

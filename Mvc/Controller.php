@@ -6,7 +6,7 @@ namespace Aria;
 * Base class of all controllers
 */
 
-abstract class Mvc_Controller_Action
+abstract class Mvc_Controller
 {
     protected $_view;
     protected $_request;
@@ -14,20 +14,12 @@ abstract class Mvc_Controller_Action
 
     public function __construct()
     {
-        $controllerFront = Mvc_Controller_Front::getInstance();
+        $controllerFront = Mvc_FrontController::getInstance();
         $this->_layout = $controllerFront->getLayoutTemplate();
-        $this->_view = new Mvc_View();
-        $controllerFront->addView($this->_view);
         $this->_request = $controllerFront->getRequest();
+        $this->_view = $controllerFront->getView();
 
         $this->_layout->assign('currentPage', isset($this->_breadcrumb) ? $this->_breadcrumb : '');
-
-        /* Built-in Ajax support to be reviewed */
-        //if (preg_match('/^ajax-/', $this->_request->getControllerName()))
-        //{
-        //    Mvc_Controller_Front::getInstance()->getResponse()->disableLayout();
-        //    $this->_view->setDefaultScript(preg_replace('/^ajax-/', '', $this->_request->getControllerName()) . '/' . $this->_request->getActionName() . '.tpl');
-        //}
     }
 
     public function getView()
@@ -43,5 +35,14 @@ abstract class Mvc_Controller_Action
     public function setDispatched($dispatched)
     {
 
+    }
+
+    protected function _forward($controller, $action = '') {
+        if (empty($action)) {
+            $action = $controller;
+            $controller = $this->_request->getControllerName();
+        }
+
+        Mvc_FrontController::getInstance()->forward($controller, $action);
     }
 }

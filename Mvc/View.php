@@ -20,7 +20,7 @@ class Mvc_View
 
     public function __construct()
     {
-        $request = Mvc_Controller_Front::getInstance()->getRequest();
+        $request = Mvc_FrontController::getInstance()->getRequest();
         $this->_templateScript = $request->getControllerName() . '/' . $request->getActionName() . '.tpl';
         $this->_template = new Template();
 

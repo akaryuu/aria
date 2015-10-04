@@ -10,10 +10,32 @@ class Bootstrap
         error_reporting(E_ALL);
         ini_set('display_errors', 'On');
 
-        define('CONFIG_PATH', $config_folder_path);
-		$config = json_decode(file_get_contents($config_folder_path . 'config.json'), true);
+        if (file_exists($config_folder_path)) {
+            define('CONFIG_PATH', $config_folder_path);
+        }
+        $config = array();
 
-        self::_setOptionsFromConfig($config);
+        foreach (new \RecursiveDirectoryIterator(CONFIG_PATH, \FilesystemIterator::SKIP_DOTS) as $filename)
+        {
+            if (preg_match('/.*\/([a-z\-]+).json$/', $filename, $matches)) {
+                $config[$matches[1]] = json_decode(file_get_contents($filename), true);
+            }
+        } 
+
+        isset($config['config']) || $config['config'] = array();
+
+        isset($config['config']['root_path']) || 
+            ($config['config']['root_path'] = './');
+        isset($config['config']['libs_path']) || 
+            ($config['config']['libs_path'] = $config['config']['root_path'] . './libs');
+        isset($config['config']['aria_path']) ||
+            ($config['config']['aria_path'] = $config['config']['libs_path'] . './Aria');
+
+        define('ROOT_PATH', $config['config']['root_path']);
+        define('LIBRARY_PATH', $config['config']['libs_path']);
+        define('ARIA_PATH', $config['config']['aria_path']);
+
+        (isset($config['config']['script_path']) && define('SCRIPT_PATH', $config['config']['script_path'])) || define('SCRIPT_PATH', '/');
 
         set_include_path(get_include_path() . PATH_SEPARATOR . LIBRARY_PATH);
 
@@ -28,18 +50,14 @@ class Bootstrap
         require_once(ARIA_PATH . 'Loader.php');
         new \Aria\Loader();
 
+        $default_config = \Aria\Mvc_Config_Default::get();
+        var_dump(array_replace_recursive($default_config, $config['config'])); die;
+
         \Aria\Registry::getInstance()->set('config', $config);
 
         $application = new \Aria\Mvc_Application();
         $application->run();
     }
 
-    protected static function _setOptionsFromConfig($config)
-    {
-        (isset($config['root_path']) && define('ROOT_PATH', $config['root_path'])) || define('ROOT_PATH', './');
-        (isset($config['libs_path']) && define('LIBRARY_PATH', $config['libs_path'])) || define('LIBRARY_PATH', ROOT_PATH . './libs/');
-        (isset($config['aria_path']) && define('ARIA_PATH', $config['aria_path'])) || define('ARIA_PATH', LIBRARY_PATH . './Aria/');
-        (isset($config['script_path']) && define('SCRIPT_PATH', $config['script_path'])) || define('SCRIPT_PATH', '/');
-    }
 }
 
