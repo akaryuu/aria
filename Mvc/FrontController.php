@@ -9,7 +9,8 @@ class Mvc_FrontController
     protected $_request;
     protected $_response;
     protected $_module;
-    protected $_layout;
+    //DEPRECATED:
+    //protected $_layout;
     protected $_view;
 
     protected function __construct()
@@ -29,7 +30,9 @@ class Mvc_FrontController
 
     public function startMVC($module)
     {
-        $this->_layout = new Template();
+	//DEPRECATED:
+        //$this->_layout = new Template();
+        //$this->_view = new Mvc_View();
         $this->_module = $module;
         $this->_controllersPath = APPLICATION_PATH . '/Controller/';
         $controllerName = ucfirst($this->_request->getControllerName());
@@ -37,9 +40,9 @@ class Mvc_FrontController
 
         $this->forward($controllerName, $this->_request->getActionName());
 
-        $this->_view->render();
-
-        echo $this->_response->output();
+        echo Mvc_View::render();
+	//DEPRECATED:
+        //echo $this->_response->output();
     }
 
     public function forward($controllerName, $actionName) {
@@ -47,7 +50,8 @@ class Mvc_FrontController
         $this->_request->setControllerName($controllerName);
         $this->_request->setActionName($actionName);
 
-        $this->_view = new Mvc_View();
+	// EPRECATED:
+        //$this->_view = new Mvc_View();
 
         $controllerName = ucfirst($controllerName);
 
@@ -55,7 +59,7 @@ class Mvc_FrontController
         {
             $controllerClass = 'Application_Controller_' . $controllerName;
             $controller = new $controllerClass($controllerName);
-            $actionFunc = preg_replace('/\-(.)/e', "strtoupper('\\1')", $actionName) . 'Action';
+            $actionFunc = preg_replace_callback('/\-(.)/', function ($matches) {return strtoupper($matches[0]);}, $actionName) . 'Action';
             if (!method_exists($controller, $actionFunc) || !ctype_alpha($actionFunc))
             {
                 throw new Exception("Action {$actionFunc} doesn't exists in controller $controllerName");
@@ -70,22 +74,22 @@ class Mvc_FrontController
             throw new Exception("Controller file $controllerName.php does not exist in $this->_module module !");
         }
     }
+    //DEPRECATED:
+    //public function getLayoutTemplate()
+    //{
+    //    return $this->_layout;
+    //}
 
-    public function getLayoutTemplate()
-    {
-        return $this->_layout;
-    }
+    //public function setView(Mvc_View $view)
+    //{
+    //    //$this->_views[] = $view;
+    //    $this->_view = $view;
+    //}
 
-    public function setView(Mvc_View $view)
-    {
-        //$this->_views[] = $view;
-        $this->_view = $view;
-    }
-
-    public function getView()
-    {
-        return $this->_view;
-    }
+    //public function getView()
+    //{
+    //    return $this->_view;
+    //}
 
     public function getRequest()
     {

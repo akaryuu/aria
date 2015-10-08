@@ -8,33 +8,37 @@ namespace Aria;
 
 abstract class Mvc_Controller
 {
-    protected $_view;
+    //DEPRECATED:
+    //protected $_view;
+    //protected $_layout;
     protected $_request;
-    protected $_layout;
 
     public function __construct()
     {
         $controllerFront = Mvc_FrontController::getInstance();
-        $this->_layout = $controllerFront->getLayoutTemplate();
         $this->_request = $controllerFront->getRequest();
-        $this->_view = $controllerFront->getView();
+        //DEPRECATED:
+        //$this->_layout = $controllerFront->getLayoutTemplate();
+        //$this->_view = $controllerFront->getView();
+        //$this->_layout->assign('page', isset($this->_breadcrumb) ? $this->_breadcrumb : '');
 
-        $this->_layout->assign('currentPage', isset($this->_breadcrumb) ? $this->_breadcrumb : '');
+        $request = array(
+	    'controller' => $this->_request->getControllerName(),
+	    'action' => $this->_request->getActionName(),
+	    'page' => $this->_request->getControllerName() . '_' . $this->_request->getActionName()
+        );
+	Mvc_View::set('request', $request);
     }
 
-    public function getView()
-    {
-        return $this->_view;
-    }
+    //DEPRECATED:
+    //public function getView()
+    //{
+    //    return $this->_view;
+    //}
 
     public function getRequest()
     {
         return $this->_request;
-    }
-
-    public function setDispatched($dispatched)
-    {
-
     }
 
     protected function _forward($controller, $action = '') {

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * THIS CLASS IS DEPRECATED
+ */
 namespace Aria;
 
 class Template extends \Smarty

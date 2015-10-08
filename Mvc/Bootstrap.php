@@ -43,15 +43,18 @@ class Bootstrap
         set_exception_handler(array('\Aria\Exception','exceptionHandler'));
 
         // Smarty Template system include
-        require_once('Smarty-3.1.14/libs/Smarty.class.php');
-        // Doctrine ORM innclude
+        //require_once('Smarty-3.1.14/libs/Smarty.class.php');
+	// Twig Template System
+	require_once('Twig-1.22.1/lib/Twig/Autoloader.php');
+	\Twig_Autoloader::register();		
+        // Doctrine ORM include
         // require_once('Doctrine/ORM/Tools/Setup.php');
 
         require_once(ARIA_PATH . 'Loader.php');
         new \Aria\Loader();
 
         $default_config = \Aria\Mvc_Config_Default::get();
-        var_dump(array_replace_recursive($default_config, $config['config'])); die;
+        $config['config'] = array_replace_recursive($default_config, $config['config']);
 
         \Aria\Registry::getInstance()->set('config', $config);
 

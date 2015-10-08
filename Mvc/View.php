@@ -14,47 +14,28 @@ namespace Aria;
  */
 class Mvc_View
 {
-    protected $_templateScript;
-    protected $_template; // Template engine object
-    protected $_noRender;
+    protected static $_vars = array();
 
-    public function __construct()
+    public static function render()
     {
         $request = Mvc_FrontController::getInstance()->getRequest();
-        $this->_templateScript = $request->getControllerName() . '/' . $request->getActionName() . '.tpl';
-        $this->_template = new Template();
 
+        $templateDir = APPLICATION_PATH . '/View/';
+        $templateScript = $request->getControllerName() . '/' . $request->getActionName() . '.twig';
+	$templateCacheDir = ROOT_PATH . 'var/cache';
+
+	$loader = new \Twig_Loader_Filesystem($templateDir);
+	$twig = new \Twig_Environment($loader, array('cache' => $templateCacheDir));
+	echo $twig->render($templateScript, array('vars' => self::$_vars));
     }
 
-    public function render($script = NULL)
+    public static function set($key, $value)
     {
-        if ($this->_noRender)
-        {
-            return;
-        }
-
-        if ($script == NULL)
-        {
-            $this->_template->render($this->_templateScript);
-        }
-        else
-        {
-            $this->_template->render($script);
-        }
+	self::$_vars[$key] = $value;
     }
 
-    public function assign($label, $value)
+    public static function setDefaultScript($script)
     {
-        $this->_template->assign($label, $value);
-    }
-
-    public function setDefaultScript($script)
-    {
-        $this->_templateScript = $script;
-    }
-
-    public function setNoRender()
-    {
-        $this->_noRender = true;
+        self::$_templateScript = $script;
     }
 }
