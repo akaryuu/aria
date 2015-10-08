@@ -18,10 +18,10 @@ class Loader
 	{	
 		// Initialize Doctrine autoload
         	// Doctrine\ORM\Tools\Setup::registerAutoloadDirectory(LIBRARY_PATH);
-		spl_autoload_register(array($this, '_autoload'));
+		spl_autoload_register(array($this, 'autoload'));
 	}
 
-	public function _autoload($classname)
+	public function autoload($classname)
 	{
         $classnameWithoutNs = str_replace('Aria\\', '', $classname);
 		$pathArray = explode('_', $classnameWithoutNs);

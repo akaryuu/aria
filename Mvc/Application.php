@@ -14,9 +14,8 @@ namespace Aria;
  */
 class Mvc_Application
 {
-	protected $_templateEngine;
 	protected $_frontController;
-    protected $_requestUrl;
+	protected $_requestUrl;
 	protected $_domain;
 	protected $_module;
 
@@ -37,8 +36,7 @@ class Mvc_Application
 		$this->_module = $domainsConfig[$this->_domain]['module'];
 		defined('APPLICATION_PATH') || define('APPLICATION_PATH', ROOT_PATH . 'application/' . $this->_module);
 		set_include_path(get_include_path() . PATH_SEPARATOR . APPLICATION_PATH);
-		$this->_frontController = Mvc_Controller_Front::getInstance();
-		$this->_templateEngine = new Template();
+		$this->_frontController = Mvc_FrontController::getInstance();
 
         // Initializing module default database
         if (isset($domainsConfig[$this->_domain]['db'])) { 

@@ -2,46 +2,64 @@
 
 namespace Aria;
 
-class Mvc_Controller_Front
+class Mvc_FrontController
 {
     private static $_instance;
     protected $_controllersPath;
     protected $_request;
     protected $_response;
     protected $_module;
-    protected $_layout;
-    protected $_views = array();
+    //DEPRECATED:
+    //protected $_layout;
+    protected $_view;
 
     protected function __construct()
     {
-        $this->_request = new Request();
+        $this->_request = new Mvc_Request();
         $this->_response = new Response();
     }
 
     public static function getInstance()
     {
-        if (!(self::$_instance instanceof Mvc_Controller_Front))
+        if (!(self::$_instance instanceof Mvc_FrontController))
         {
-            self::$_instance = new Mvc_Controller_Front();
+            self::$_instance = new Mvc_FrontController();
         }
         return self::$_instance;
     }
 
     public function startMVC($module)
     {
-        $this->_layout = new Template();
+	//DEPRECATED:
+        //$this->_layout = new Template();
+        //$this->_view = new Mvc_View();
         $this->_module = $module;
         $this->_controllersPath = APPLICATION_PATH . '/Controller/';
-        // Using eval modifier is deprecated
-        // $controllerName = ucfirst(preg_replace(array('/-(.)/e', '/^ajax/'), array('strtoupper(\'\\1\')', ''), $this->_request->getControllerName()));
         $controllerName = ucfirst($this->_request->getControllerName());
         $session = Session::getInstance();
+
+        $this->forward($controllerName, $this->_request->getActionName());
+
+        echo Mvc_View::render();
+	//DEPRECATED:
+        //echo $this->_response->output();
+    }
+
+    public function forward($controllerName, $actionName) {
+
+        $this->_request->setControllerName($controllerName);
+        $this->_request->setActionName($actionName);
+
+	// EPRECATED:
+        //$this->_view = new Mvc_View();
+
+        $controllerName = ucfirst($controllerName);
 
         if (file_exists($this->_controllersPath . $controllerName . '.php') && ctype_alpha($controllerName))
         {
             $controllerClass = 'Application_Controller_' . $controllerName;
             $controller = new $controllerClass($controllerName);
-            $actionFunc = preg_replace('/\-(.)/e', "strtoupper('\\1')", $this->_request->getActionName()) . 'Action';
+            $actionFunc = preg_replace_callback('/\-(.)/', function ($matches) {return strtoupper($matches[0]);}, $actionName) . 'Action';
             if (!method_exists($controller, $actionFunc) || !ctype_alpha($actionFunc))
             {
                 throw new Exception("Action {$actionFunc} doesn't exists in controller $controllerName");
@@ -53,25 +71,25 @@ class Mvc_Controller_Front
         }
         else
         {
-            throw new Exception("Controller file $controllerName.php does not exist in $module module !");
+            throw new Exception("Controller file $controllerName.php does not exist in $this->_module module !");
         }
-
-        foreach ($this->_views as $view)
-        {
-            $view->render();
-        }
-        echo $this->_response->output();
     }
+    //DEPRECATED:
+    //public function getLayoutTemplate()
+    //{
+    //    return $this->_layout;
+    //}
 
-    public function getLayoutTemplate()
-    {
-        return $this->_layout;
-    }
+    //public function setView(Mvc_View $view)
+    //{
+    //    //$this->_views[] = $view;
+    //    $this->_view = $view;
+    //}
 
-    public function addView(Mvc_View $view)
-    {
-        $this->_views[] = $view;
-    }
+    //public function getView()
+    //{
+    //    return $this->_view;
+    //}
 
     public function getRequest()
     {

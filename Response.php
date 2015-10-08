@@ -29,7 +29,7 @@ class Response
         }
         else
         {
-            $template = Mvc_Controller_Front::getInstance()->getLayoutTemplate();
+            $template = Mvc_FrontController::getInstance()->getLayoutTemplate();
             $template->assign('content', $this->getHtml());
             $template->display('layout.tpl');
         }

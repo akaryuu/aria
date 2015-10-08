@@ -15,7 +15,7 @@ class Tools
     public static function debug($value, $desc='NoName')
     {
         self::dump($value);
-        //$session = My_Controller_Front::getInstance()->getRequest()->getSession();
+        //$session = Mvc_FrontController::getInstance()->getRequest()->getSession();
         //$debugobj = $session['phpdebugobj'];
         //if ($desc == 'query')
         //{
